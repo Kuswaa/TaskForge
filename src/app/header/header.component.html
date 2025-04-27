@@ -1,12 +1,16 @@
-<div class="outermost w-full bg-purple-500 h-[12vh] flex items-center justify-between">
+<div class="outermost w-full h-[12vh] flex items-center justify-between border-b border-gray-300 dark:border-b-gray-600 dark:bg-gray-800 dark:text-white">
     <div class="left">
-        <div class="logo bg-green-600">LOGO</div>
+        <div class="logo bg-green-600 cursor-pointer">LOGO</div>
     </div>
-    <div class="right flex gap-4">
-        <div class="search bg-green-600">DARK/LIGHT</div>
-        <div class="profile bg-green-600 flex gap-2 items-center">
-            <div class="span">Hi, Full Username</div>
-            <div class="img">IMG</div>
+    <div class="right flex gap-4 items-center">
+        <div class="toggle" (click)="themeToggleService.toggleDarkMode()">
+            <!-- <span *ngIf="!isDarkMode"><i class="fas fa-sun text-xl p-1 px-2 cursor-pointer"></i></span>
+            <span *ngIf="isDarkMode"><i class="fas fa-moon text-xl p-1 px-2 cursor-pointer"></i></span> -->
+            <i class="fas fa-moon text-xl p-1 px-2 cursor-pointer"></i>    
+        </div>
+        <div class="profile flex gap-2 items-center cursor-pointer dark:text-white">
+            <div class="span">Hi, Username</div>
+            <div class="img"><i class="fas fa-user-circle text-2xl p-1 pr-2 cursor-pointer"></i></div>
         </div>
     </div>
 </div>

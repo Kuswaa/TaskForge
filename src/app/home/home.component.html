@@ -1,21 +1,110 @@
-<div class="outermost">
-    <div class="upper grid grid-cols-3 gap-4 p-4">
-        <div class="bg-purple-400 flex gap-1 items-center p-3">
+<div class="outermost p-4 dark:bg-gray-700 dark:text-white w-full h-full ">
+
+    <div class="upper grid grid-cols-3 gap-4">
+        <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
             <div class="nmbr text-4xl">09</div>
-            <div class="status text-lg">Total Tasks</div>
+            <div class="status pt-1 text-lg">Total Tasks</div>
         </div>
-        <div class="bg-purple-400 flex gap-1 items-center p-3">
+        <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
             <div class="nmbr text-4xl">05</div>
-            <div class="status text-lg">Tasks Pending</div>
+            <div class="status pt-1 text-lg">Tasks Pending</div>
         </div>
-        <div class="bg-purple-400 flex gap-1 items-center p-3">
+        <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
             <div class="nmbr text-4xl">04</div>
-            <div class="status text-lg">Tasks Completed</div>
+            <div class="status pt-1 text-lg">Tasks Completed</div>
         </div>
     </div>
-    <div class="lower">
-        <div class="task">
-            
+
+    <div class="lower flex flex-col mb-4">
+        <div class="heading1 flex justify-between items-center pt-4 dark:text-white">
+            <div class="text-2xl">Tasks</div>
+            <div class="toggler-btnn"><i class="fas fa-list text-xl cursor-pointer"></i></div>
+        </div>
+        <div class="card-grid grid grid-cols-4 gap-4 mt-4">
+            <div *ngFor="let task of tasks; index as i" (click)="openDetailModal(i)" class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer dark:text-white" id="task-grid">
+                <h3 class="text-xl font-bold">{{ task.title }}</h3>
+                <div class="pt-2 mt-2 border-t border-gray-300 dark:border-gray-600 flex flex-row justify-between dark:text-white">
+                    <div>
+                        <div>Due: {{ task.date }}</div>
+                        <div>Category: {{ task.category }}</div>
+                    </div>
+                    <div class="flex items-center">  
+                        <input class="cursor-pointer" type="checkbox" [checked]="task.completed"/>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white rounded-xl p-6 w-[400px] relative">
+                    <div class="absolute top-4 right-4">
+                        <button (click)="toggleDropdown()" class="text-gray-500 hover:text-gray-700 text-2xl">⋮</button>
+                        <div *ngIf="showDropdown" class="absolute right-0 mt-2 bg-white border rounded shadow-md z-10">
+                            <button (click)="openEditModal()" class="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">Edit</button>
+                            <button (click)="deleteTask()" class="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left text-red-500">Delete</button>
+                        </div>
+                    </div>
+                    <h2 class="text-xl font-bold mb-2">{{ selectedTask?.title }}</h2>
+                    <p class="text-gray-600 mb-4">{{ selectedTask?.description }}</p>
+                    <div class="text-sm text-gray-500 mb-2">Category: {{ selectedTask?.category }}</div>
+                    <div class="text-sm text-gray-500 mb-4">Due Date: {{ selectedTask?.date }}</div>            
+                    <div class="flex items-center">
+                        <input type="checkbox" *ngIf="selectedTask" [(ngModel)]="selectedTask.completed" (click)="$event.stopPropagation()"/>
+                        <label class="ml-2 text-gray-700">Completed</label>
+                    </div>
+                    <button (click)="closeModals()" class="mt-6 text-blue-600 hover:underline text-sm">Close</button>
+                </div>
+            </div>
+            <div *ngIf="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                <div class="bg-white rounded-xl p-6 w-[400px]">
+                    <form (ngSubmit)="submitEdit()" #editForm="ngForm">
+                        <h2 class="text-xl font-bold mb-4">Edit Task</h2>
+                        <div class="mb-4">
+                            <input
+                                type="text"
+                                class="border rounded w-full p-2"
+                                [(ngModel)]="editTask.title"
+                                name="title"
+                                placeholder="Task Title"
+                                required
+                            />
+                        </div>
+                        <div class="mb-4">
+                            <textarea 
+                                class="border rounded w-full p-2" 
+                                [(ngModel)]="editTask.description" 
+                                name="description" 
+                                placeholder="Task Description" 
+                                required>
+                            </textarea>
+                        </div>
+                        <div class="mb-4">
+                            <input 
+                                type="date" 
+                                class="border rounded w-full p-2" 
+                                [(ngModel)]="editTask.date" 
+                                name="date" 
+                                required
+                            />
+                        </div>
+                        <div class="mb-6">
+                            <select 
+                                class="border rounded w-full p-2" 
+                                [(ngModel)]="editTask.category" 
+                                name="category" 
+                                required
+                            >
+                                <option value="" disabled>Select Category</option>
+                                <option value="Work">Work</option>
+                                <option value="Personal">Personal</option>
+                                <option value="Urgent">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
