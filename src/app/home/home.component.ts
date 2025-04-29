@@ -1,31 +1,28 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DatabaseCommService } from '../database-comm.service';
+import { Observable } from 'rxjs';
 
-interface Task
-{
+interface Task {
   title: string;
   description: string;
   category: string;
   date: string;
   completed: boolean;
+  id?: string;
 }
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrls: ['./home.component.css']
 })
-export class HomeComponent
-{
-  tasks: Task[] = [
-    { title: "Task 1", description: "Description 1", category: "Work", date: "2025-05-01", completed: false },
-    { title: "Task 2", description: "Description 2", category: "Personal", date: "2025-06-01", completed: false }
-  ];
+export class HomeComponent implements OnInit {
+  tasks$!: Observable<Task[]>;
+  tasks: Task[] = [];
 
   showDetailModal = false;
   showEditModal = false;
@@ -34,6 +31,19 @@ export class HomeComponent
   selectedTaskIndex: number | null = null;
   selectedTask: Task | null = null;
   editTask: Task = this.createEmptyTask();
+
+  constructor(private databaseService: DatabaseCommService) {}
+
+  ngOnInit() {
+    this.fetchTasks();
+  }
+
+  fetchTasks() {
+    this.tasks$ = this.databaseService.getTasks();
+    this.tasks$.subscribe(data => {
+      this.tasks = data;
+    });
+  }
 
   openDetailModal(index: number): void {
     this.selectedTaskIndex = index;
@@ -52,11 +62,26 @@ export class HomeComponent
   }
 
   deleteTask(): void {
-    if (this.selectedTaskIndex !== null) {
-      this.tasks.splice(this.selectedTaskIndex, 1);
-      this.closeModals();
+    if (
+      this.selectedTaskIndex !== null &&
+      this.selectedTaskIndex >= 0 &&
+      this.selectedTask
+    ) {
+      const taskId = this.selectedTask.id;
+      if (taskId) {
+        this.databaseService.deleteTask(taskId).subscribe(
+          () => {
+            this.tasks.splice(this.selectedTaskIndex!, 1);
+            this.closeModals();
+          },
+          (error) => {
+            console.error('Error deleting task: ', error);
+          }
+        );
+      }
     }
   }
+  
 
   openEditModal(): void {
     if (this.selectedTaskIndex === null || this.selectedTask === null) return;
@@ -67,12 +92,22 @@ export class HomeComponent
   }
 
   submitEdit(): void {
-    if (this.selectedTaskIndex !== null) {
-      this.tasks[this.selectedTaskIndex] = { ...this.editTask };
-      this.closeModals();
+    if (this.selectedTaskIndex !== null && this.selectedTask && this.selectedTask.id) {
+      const taskId = this.selectedTask.id;
+      const updatedTask = { ...this.editTask };
+  
+      this.databaseService.updateTask(taskId, updatedTask).subscribe(
+        () => {
+          this.tasks[this.selectedTaskIndex!] = { ...this.editTask };
+          this.closeModals();
+        },
+        (error) => {
+          console.error('Error updating task: ', error);
+        }
+      );
     }
   }
-
+  
   createEmptyTask(): Task {
     return {
       title: '',
@@ -81,5 +116,17 @@ export class HomeComponent
       date: '',
       completed: false
     };
+  }
+
+  addNewTask(task: Task) {
+    this.databaseService.addTask(task).subscribe(
+      (docRef) => {
+        console.log('New task added:', docRef);
+        this.fetchTasks(); 
+      },
+      (error) => {
+        console.error('Error adding task: ', error);
+      }
+    );
   }
 }

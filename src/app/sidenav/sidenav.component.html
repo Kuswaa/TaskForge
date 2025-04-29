@@ -9,11 +9,11 @@
             <div class="tag flex justify-between m-2 p-3 pt-1 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold cursor-pointer"><span>Others - (20)</span><span><i class="fas fa-arrow-right"></i></span> </div>
         </div>
         <div class="add-btns flex flex-row justify-between">
-            <div class="add-t-1 border-2 border-blue-600 bg-blue-600 m-2 mt-4 p-2 text-center text-white font-semibold rounded-lg cursor-pointer">Add a Task</div>
+            <div (click)="createTask()" class="add-t-1 border-2 border-blue-600 bg-blue-600 m-2 mt-4 p-2 text-center text-white font-semibold rounded-lg cursor-pointer">Add a Task</div>
             <div class="add-t-2 border-2 border-gray-600 m-2 mt-4 p-2 text-center dark:text-white font-semibold rounded-lg cursor-pointer">Add a Tag</div>
         </div>
     </div>
     <div class="settings border-t border-gray-300 dark:border-gray-600">
-        <div class="logout bg-red-700 m-2 p-1 text-center text-lg text-white font-semibold cursor-pointer">Logout</div>
+        <div (click)="logout()" class="logout bg-red-600 rounded-lg m-2 p-1 text-center text-lg text-white font-semibold cursor-pointer">Logout</div>
     </div>
 </div>
