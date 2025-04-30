@@ -1,38 +1,74 @@
-import { Component } from '@angular/core';
+import { Component , EventEmitter, Output} from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { DatabaseCommService } from '../database-comm.service'; 
+import { Task } from '../models/task.model'; 
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidenav',
   standalone: true,
-  imports: [],
+  imports: [FormsModule, CommonModule],
   templateUrl: './sidenav.component.html',
   styleUrl: './sidenav.component.css'
 })
+
 export class SidenavComponent {
 
+  @Output() categorySelected = new EventEmitter<string>();
+
+  categories = ['Personal', 'Study', 'Work', 'Home'];
+
+  showCreateModal = false;
+
+  newTask: Task = {
+    title: '',
+    description: '',
+    category: '',
+    date: '',
+    completed: false
+  };
+
   constructor(private authService: AuthService, private dbService: DatabaseCommService) {}
+
+  onCategoryClick(category: string): void {
+    this.categorySelected.emit(category);
+  }
 
   logout() {
     this.authService.logout();
   }
 
-  createTask(): void {
-    const newTask = {
-      title: 'New Task',
-      description: 'Description of the task',
-      category: 'Work',
-      date: new Date().toISOString().split('T')[0],
-      completed: false
-    };
+  submitCreate(): void {
+    if (!this.newTask.title || !this.newTask.description || !this.newTask.category || !this.newTask.date) {
+      console.warn('Please fill in all fields');
+      return;
+    }
 
-    this.dbService.addTask(newTask).subscribe({
+    this.dbService.addTask(this.newTask).subscribe({
       next: () => {
         console.log('Task created successfully');
+        this.showCreateModal = false;
+        this.resetNewTask();
       },
       error: (error) => {
         console.error('Error creating task:', error);
       }
     });
+  }
+
+  closeModal(): void {
+    this.showCreateModal = false;
+    this.resetNewTask(); 
+  }
+
+  resetNewTask(): void {
+    this.newTask = {
+      title: '',
+      description: '',
+      category: '',
+      date: '',
+      completed: false
+    };
   }
 }

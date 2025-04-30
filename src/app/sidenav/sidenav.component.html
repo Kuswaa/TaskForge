@@ -6,14 +6,73 @@
             <div class="tag flex justify-between m-2 p-3 pt-1 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold cursor-pointer"><span>Study - (20)</span><span><i class="fas fa-arrow-right"></i></span> </div>
             <div class="tag flex justify-between m-2 p-3 pt-1 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold cursor-pointer"><span>Work - (20)</span><span><i class="fas fa-arrow-right"></i></span> </div>
             <div class="tag flex justify-between m-2 p-3 pt-1 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold cursor-pointer"><span>Home - (20)</span><span><i class="fas fa-arrow-right"></i></span> </div>
-            <div class="tag flex justify-between m-2 p-3 pt-1 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold cursor-pointer"><span>Others - (20)</span><span><i class="fas fa-arrow-right"></i></span> </div>
         </div>
-        <div class="add-btns flex flex-row justify-between">
-            <div (click)="createTask()" class="add-t-1 border-2 border-blue-600 bg-blue-600 m-2 mt-4 p-2 text-center text-white font-semibold rounded-lg cursor-pointer">Add a Task</div>
-            <div class="add-t-2 border-2 border-gray-600 m-2 mt-4 p-2 text-center dark:text-white font-semibold rounded-lg cursor-pointer">Add a Tag</div>
+        <div class="add-btns flex  justify-center">
+            <div (click)="showCreateModal = true" class="add-t-1 border-2 border-blue-600 bg-blue-600 m-2 w-full mt-4 p-2 text-lg text-center text-white font-semibold rounded-lg cursor-pointer">Add a Task</div>
         </div>
     </div>
     <div class="settings border-t border-gray-300 dark:border-gray-600">
         <div (click)="logout()" class="logout bg-red-600 rounded-lg m-2 p-1 text-center text-lg text-white font-semibold cursor-pointer">Logout</div>
     </div>
+
+    <div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div class="bg-white rounded-xl p-6 w-[400px]">
+          <form (ngSubmit)="submitCreate()" #createForm="ngForm">
+            <h2 class="text-xl font-bold text-center mb-4">Create a New Task</h2>
+
+            <div class="mb-4">
+              <input
+                type="text"
+                class="border rounded w-full p-2"
+                [(ngModel)]="newTask.title"
+                name="title"
+                placeholder="Task Title"
+                required
+              />
+            </div>
+      
+            <div class="mb-4">
+              <textarea 
+                class="border rounded w-full p-2" 
+                [(ngModel)]="newTask.description" 
+                name="description" 
+                placeholder="Task Description" 
+                required>
+              </textarea>
+            </div>
+      
+            <div class="mb-4">
+              <input 
+                type="date" 
+                class="border rounded w-full p-2" 
+                [(ngModel)]="newTask.date" 
+                name="date" 
+                required
+              />
+            </div>
+      
+            <div class="mb-6">
+              <select 
+                class="border rounded w-full p-2" 
+                [(ngModel)]="newTask.category" 
+                name="category" 
+                required
+              >
+                <option value="" disabled>Select Category</option>
+                <option value="Personal">Personal</option>
+                <option value="Study">Study</option>
+                <option value="Work">Work</option>
+                <option value="Home">Home</option>
+              </select>
+            </div>
+      
+            <div class="flex justify-between">
+                <button (click)="closeModal()" type="button" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Cancel</button>
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Create</button>
+            </div>
+           </form>
+        </div>
+      </div>
+      
+
 </div>

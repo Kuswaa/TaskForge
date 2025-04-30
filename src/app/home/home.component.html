@@ -2,15 +2,15 @@
 
     <div class="upper grid grid-cols-3 gap-4">
         <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
-            <div class="nmbr text-4xl">09</div>
+            <div class="nmbr text-4xl">{{ totalTasks }}</div>
             <div class="status pt-1 text-lg">Total Tasks</div>
         </div>
         <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
-            <div class="nmbr text-4xl">05</div>
+            <div class="nmbr text-4xl">{{ pendingTasks }}</div>
             <div class="status pt-1 text-lg">Tasks Pending</div>
         </div>
         <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
-            <div class="nmbr text-4xl">04</div>
+            <div class="nmbr text-4xl">{{ completedTasks }}</div>
             <div class="status pt-1 text-lg">Tasks Completed</div>
         </div>
     </div>
@@ -20,6 +20,9 @@
             <div class="text-2xl">Tasks</div>
             <div class="toggler-btnn"><i class="fas fa-list text-xl cursor-pointer"></i></div>
         </div>
+
+            <!-- < SHOW CARD> -->
+
         <div class="card-grid grid grid-cols-4 gap-4 mt-4">
             <div *ngFor="let task of tasks; index as i" (click)="openDetailModal(i)" class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer dark:text-white" id="task-grid">
                 <h3 class="text-xl font-bold">{{ task.title }}</h3>
@@ -29,10 +32,19 @@
                         <div>Category: {{ task.category }}</div>
                     </div>
                     <div class="flex items-center">  
-                        <input class="cursor-pointer" type="checkbox" [checked]="task.completed"/>
+                        <input 
+                            class="cursor-pointer" 
+                            type="checkbox" 
+                            [checked]="task.completed" 
+                            (click)="$event.stopPropagation()" 
+                            />
                     </div>
                 </div>
             </div>
+
+            <!-- < SHOW DETAIL MODAL > -->
+
+
             <div *ngIf="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div class="bg-white rounded-xl p-6 w-[400px] relative">
                     <div class="absolute top-4 right-4">
@@ -53,6 +65,9 @@
                     <button (click)="closeModals()" class="mt-6 text-blue-600 hover:underline text-sm">Close</button>
                 </div>
             </div>
+
+            <!-- < SHOW EDIT MODAL > -->
+
             <div *ngIf="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                 <div class="bg-white rounded-xl p-6 w-[400px]">
                     <form (ngSubmit)="submitEdit()" #editForm="ngForm">

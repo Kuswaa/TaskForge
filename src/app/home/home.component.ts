@@ -1,17 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DatabaseCommService } from '../database-comm.service';
-import { Observable } from 'rxjs';
-
-interface Task {
-  title: string;
-  description: string;
-  category: string;
-  date: string;
-  completed: boolean;
-  id?: string;
-}
+import { Observable, of } from 'rxjs';
+import { Task } from '../models/task.model';
+import { AuthService } from '../auth/auth.service';  
+import { Firestore, collection, getDocs } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +14,7 @@ interface Task {
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
+
 export class HomeComponent implements OnInit {
   tasks$!: Observable<Task[]>;
   tasks: Task[] = [];
@@ -32,18 +27,41 @@ export class HomeComponent implements OnInit {
   selectedTask: Task | null = null;
   editTask: Task = this.createEmptyTask();
 
-  constructor(private databaseService: DatabaseCommService) {}
+  constructor(private databaseService: DatabaseCommService, private authService: AuthService, private firestore: Firestore) {}
 
   ngOnInit() {
-    this.fetchTasks();
-  }
-
-  fetchTasks() {
     this.tasks$ = this.databaseService.getTasks();
-    this.tasks$.subscribe(data => {
-      this.tasks = data;
+  } 
+
+  getTasks() {  
+    const userId = this.authService.getCurrentUserId();
+    const tasksRef = collection(this.firestore, `users/${userId}/tasks`);
+  
+    getDocs(tasksRef).then(snapshot => {
+      const tasks: Task[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data() as Task,
+      }));
+      this.tasks = tasks;
+    }).catch(error => {
+      console.error('Error fetching tasks:', error);
     });
   }
+  
+  get totalTasks(): number {
+    return this.tasks.length;
+  }
+  
+  get pendingTasks(): number {
+    return this.tasks.filter(task => !task.completed).length;
+  }
+  
+  get completedTasks(): number {
+    return this.tasks.filter(task => task.completed).length;
+  }
+  
+
+
 
   openDetailModal(index: number): void {
     this.selectedTaskIndex = index;
@@ -122,7 +140,7 @@ export class HomeComponent implements OnInit {
     this.databaseService.addTask(task).subscribe(
       (docRef) => {
         console.log('New task added:', docRef);
-        this.fetchTasks(); 
+        this.getTasks(); 
       },
       (error) => {
         console.error('Error adding task: ', error);
