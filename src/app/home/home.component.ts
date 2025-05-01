@@ -5,6 +5,7 @@ import { DatabaseCommService } from '../database-comm.service';
 import { Task } from '../models/task.model';
 import { AuthService } from '../auth/auth.service';
 import { Firestore, collection, onSnapshot } from '@angular/fire/firestore';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy
   tasks: Task[] = [];
   filteredTasks: any[] = [];
   userId: string | null = null;
-  selectedCategory: string = '';
+  selectedCategory: string = 'All';
 
   showDropdown: string | null = null;
   showEditModal = false;
@@ -36,7 +37,8 @@ export class HomeComponent implements OnInit, OnDestroy
   constructor(
     private databaseService: DatabaseCommService,
     private authService: AuthService,
-    private firestore: Firestore
+    private firestore: Firestore,
+    private categoryService: CategoryService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +55,10 @@ export class HomeComponent implements OnInit, OnDestroy
         this.unsubscribeSnapshot?.();
       }
     });
+
+    this.categoryService.selectedCategory$.subscribe(category => {
+      this.onCategorySelected(category);
+    });
   }
 
   onCategorySelected(category: string) {
@@ -61,15 +67,24 @@ export class HomeComponent implements OnInit, OnDestroy
   }
 
   filterTasks() {
-    if (this.selectedCategory) {
-      this.filteredTasks = this.tasks.filter(task => task.category === this.selectedCategory);
+    if (this.selectedCategory === 'All' || !this.selectedCategory) {
+      this.filteredTasks = this.tasks;
     } else {
-      this.filteredTasks = this.tasks; 
+      this.filteredTasks = this.tasks.filter(
+        task => task.category?.toLowerCase() === this.selectedCategory.toLowerCase()
+      );
     }
+    console.log(`Filtering by category: ${this.selectedCategory}, matched: ${this.filteredTasks.length}`);
   }
 
   listenToTasks(): void {
-    if (!this.userId) return;
+    if (!this.userId)
+    {
+      console.warn('No userId yet');
+      return;
+    }
+
+    console.log('Listening to tasks for userId:', this.userId);
 
     const tasksRef = collection(this.firestore, `users/${this.userId}/tasks`);
     this.unsubscribeSnapshot?.(); 
@@ -79,6 +94,8 @@ export class HomeComponent implements OnInit, OnDestroy
         id: doc.id,
         ...doc.data()
       } as Task));
+      console.log('Fetched tasks check:', this.tasks);  
+      this.filterTasks();
     });
   }
 

@@ -4,6 +4,7 @@ import { DatabaseCommService } from '../database-comm.service';
 import { Task } from '../models/task.model'; 
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { CategoryService } from '../category.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -22,7 +23,7 @@ export class SidenavComponent {
     this.openModal.emit();
   }
   
-  categories = ['Personal', 'Study', 'Work', 'Home'];
+  categories = ['All', 'Personal', 'Study', 'Work', 'Home'];
 
   showCreateModal = false;
 
@@ -34,12 +35,17 @@ export class SidenavComponent {
     completed: false
   };
 
-  selectedCategory: string = 'all';
+  selectedCategory: string = 'All';
 
-  constructor(private authService: AuthService, private dbService: DatabaseCommService) {}
+  constructor(private authService: AuthService, private dbService: DatabaseCommService, private categoryService: CategoryService) {}
   
   onCategoryClick(category: string) {
     this.categorySelected.emit(category);
+    this.selectedCategory= category;
+  }
+
+  selectCategory(category: string) {
+    this.categoryService.setCategory(category);
   }
 
   logout() {  

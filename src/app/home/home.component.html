@@ -25,7 +25,7 @@
 
         <div class="card-grid grid grid-cols-2 gap-4 mt-4">
             <div
-                *ngFor="let task of tasks; index as i" 
+                *ngFor="let task of filteredTasks; index as i" 
                 class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer z-0 dark:text-white"
                 [ngClass]="{ 'opacity-40 line-through': task.completed }"
                 id="task-grid"

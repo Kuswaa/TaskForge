@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, addDoc, updateDoc, doc, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, collection, addDoc, updateDoc, doc, deleteDoc, collectionData } from '@angular/fire/firestore';
 import { AuthService } from './auth/auth.service';
 import { Task } from './models/task.model';
 import { Observable, switchMap, from } from 'rxjs';
@@ -17,6 +17,15 @@ export class DatabaseCommService {
     const userId = await this.getUserId();
     return `users/${userId}/tasks`;
   }  
+
+  getUserTasks(): Observable<any[]> {
+    return from(this.getUserTasksCollectionPath()).pipe(
+      switchMap((path: string) => {
+        const tasksRef = collection(this.firestore, path);
+        return collectionData(tasksRef, { idField: 'id' }) as Observable<any[]>;
+      })
+    );
+  }
 
   private async getUserId(): Promise<string> {
     const userId = await this.authService.getCurrentUserIdAsync();

@@ -4,8 +4,8 @@
           
           <div class="tags-selector" *ngFor="let category of categories">
             <div
-              (click)="onCategoryClick(category)"
-              class="tag flex justify-start p-3 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
+              (click)="selectCategory(category) ; onCategoryClick(category)"
+              class="tag flex justify-start p-3 border-b border-gray-300 dark:border-gray-600 px-4 text-md dark:text-white font-semibold dark:hover:bg-gray-600 cursor-pointer"
               [ngClass]="{'bg-blue-500 text-white': selectedCategory === category}"
             >
               <span>{{ category }}</span>
