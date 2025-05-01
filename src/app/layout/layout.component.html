@@ -1,12 +1,81 @@
-<div class="sticky top-0">
+<div class="fixed top-0 left-0 w-full z-50">
     <app-header></app-header>
 </div>
 
-<div class="flex flex-row">
-    <div class="w-[17%]">
-        <app-sidenav></app-sidenav>
+<div class="pt-[12vh] flex">
+    <div class="w-[17%] fixed top-[12vh] bottom-0 left-0">
+        <app-sidenav  (openModal)="openCreateModal()"></app-sidenav>
     </div>
-    <div class="router-div w-[83%]">
+
+    <div class="ml-[17%] w-[83%] h-[calc(100vh-12vh)] overflow-y-auto">
         <app-home></app-home>
     </div>
 </div>
+
+
+<div *ngIf="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-[1001]">
+    <div class="bg-white rounded-xl p-6 dark:bg-gray-800 dark:text-white w-[400px] h-fit z-[1099]">
+      <form (ngSubmit)="submitCreate()" #createForm="ngForm">
+        <h2 class="text-xl font-bold mb-4">Create a New Task</h2>
+  
+        <div class="mb-4">
+          <input
+            type="text"
+            class="border rounded w-full p-2"
+            [(ngModel)]="newTask.title"
+            name="title"
+            placeholder="Task Title"
+            required/>
+        </div>
+  
+        <div class="mb-4">
+          <textarea
+            class="border rounded w-full p-2"
+            [(ngModel)]="newTask.description"
+            name="description"
+            placeholder="Task Description"
+            required>
+          </textarea>
+        </div>
+  
+        <div class="mb-4">
+          <input
+            type="date"
+            class="border rounded w-full p-2"
+            [(ngModel)]="newTask.date"
+            name="date"
+            required/>
+        </div>
+  
+        <div class="mb-6">
+          <select
+            class="border rounded w-full p-2"
+            [(ngModel)]="newTask.category"
+            name="category"
+            required>
+            <option value="" disabled>Select Category</option>
+            <option value="Personal">Personal</option>
+            <option value="Study">Study</option>
+            <option value="Work">Work</option>
+            <option value="Home">Home</option>
+          </select>
+        </div>
+  
+        <div class="flex justify-between">
+          <button
+            (click)="closeModal()"
+            type="button"
+            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  

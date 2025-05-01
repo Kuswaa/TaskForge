@@ -1,6 +1,6 @@
-<div class="outermost p-4 dark:bg-gray-700 dark:text-white w-full h-full ">
+<div class="outermost p-4 dark:bg-gray-700 bg-white dark:text-white w-full min-h-full h-fit z-0">
 
-    <div class="upper grid grid-cols-3 gap-4">
+    <!-- <div class="upper grid grid-cols-3 gap-4">
         <div class="border border-gray-300 dark:border-gray-600 dark:bg-gray-800 rounded-lg flex gap-2 items-center pt-2 p-3 cursor-pointer">
             <div class="nmbr text-4xl">{{ totalTasks }}</div>
             <div class="status pt-1 text-lg">Total Tasks</div>
@@ -13,65 +13,55 @@
             <div class="nmbr text-4xl">{{ completedTasks }}</div>
             <div class="status pt-1 text-lg">Tasks Completed</div>
         </div>
-    </div>
+    </div> -->
 
     <div class="lower flex flex-col mb-4">
-        <div class="heading1 flex justify-between items-center pt-4 dark:text-white">
-            <div class="text-2xl">Tasks</div>
-            <div class="toggler-btnn"><i class="fas fa-list text-xl cursor-pointer"></i></div>
+        <div class="heading1 flex justify-between items-center dark:text-white">
+            <div class="text-4xl">Tasks</div>
+            <!-- <div class="toggler-btnn"><i class="fas fa-list text-xl cursor-pointer"></i></div> -->
         </div>
 
             <!-- < SHOW CARD> -->
 
-        <div class="card-grid grid grid-cols-4 gap-4 mt-4">
-            <div *ngFor="let task of tasks; index as i" (click)="openDetailModal(i)" class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer dark:text-white" id="task-grid">
-                <h3 class="text-xl font-bold">{{ task.title }}</h3>
-                <div class="pt-2 mt-2 border-t border-gray-300 dark:border-gray-600 flex flex-row justify-between dark:text-white">
-                    <div>
-                        <div>Due: {{ task.date }}</div>
-                        <div>Category: {{ task.category }}</div>
-                    </div>
-                    <div class="flex items-center">  
+        <div class="card-grid grid grid-cols-2 gap-4 mt-4">
+            <div
+                *ngFor="let task of tasks; index as i" 
+                class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer dark:text-white"
+                [ngClass]="{ 'opacity-40 line-through': task.completed }"
+                id="task-grid"
+                >                
+                <div class="flex flex-row items-center justify-between relative z-10">
+                    <div class="text-xl font-bold">{{ task.title }}</div>
+                    <div class="flex items-center mr-4 relative z-10">
                         <input 
-                            class="cursor-pointer" 
-                            type="checkbox" 
-                            [checked]="task.completed" 
-                            (click)="$event.stopPropagation()" 
-                            />
-                    </div>
-                </div>
-            </div>
-
-            <!-- < SHOW DETAIL MODAL > -->
-
-
-            <div *ngIf="showDetailModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <div class="bg-white rounded-xl p-6 w-[400px] relative">
-                    <div class="absolute top-4 right-4">
-                        <button (click)="toggleDropdown()" class="text-gray-500 hover:text-gray-700 text-2xl">⋮</button>
-                        <div *ngIf="showDropdown" class="absolute right-0 mt-2 bg-white border rounded shadow-md z-10">
-                            <button (click)="openEditModal()" class="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left">Edit</button>
-                            <button (click)="deleteTask()" class="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left text-red-500">Delete</button>
+                        class="cursor-pointer" 
+                        type="checkbox" 
+                        [checked]="task.completed"
+                        (change)="markComplete(task)"
+                        />
+                        <button (click)="toggleDropdown(task.id!)"
+                        class="text-gray-500 ml-3 hover:text-gray-700 text-2xl z-10">⋮</button>
+                        <div *ngIf="showDropdown === task.id" class="absolute right-5 bg-white dark:border-0 border mt-6 shadow-md">
+                            <button (click)="openEditModal(task)" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white w-full text-left border-b border-gray-300 dark:border-gray-700">Edit</button>
+                            <button (click)="deleteTask(task.id!)" class="block px-4 py-2 text-sm hover:bg-gray-100 w-full text-left dark:bg-red-600 dark:hover:bg-red-900 dark:text-white text-red-500">Delete</button>
                         </div>
                     </div>
-                    <h2 class="text-xl font-bold mb-2">{{ selectedTask?.title }}</h2>
-                    <p class="text-gray-600 mb-4">{{ selectedTask?.description }}</p>
-                    <div class="text-sm text-gray-500 mb-2">Category: {{ selectedTask?.category }}</div>
-                    <div class="text-sm text-gray-500 mb-4">Due Date: {{ selectedTask?.date }}</div>            
-                    <div class="flex items-center">
-                        <input type="checkbox" *ngIf="selectedTask" [(ngModel)]="selectedTask.completed" (click)="$event.stopPropagation()"/>
-                        <label class="ml-2 text-gray-700">Completed</label>
+                </div>
+                <div class="pt-2 mt-2 border-t border-gray-300 dark:border-gray-600 flex flex-row justify-between items-start dark:text-white">
+                    <div><span class="font-semibold max-w-[70%]">Description: </span>  {{ task.description }}</div>
+                    <div class="flex flex-col items-end justify-center min-w-[30%]">
+                        <div><span class="font-semibold">Due: </span>{{ task.date }}</div>
+                        <div><span class="font-semibold">Category: </span>{{ task.category }}</div>
                     </div>
-                    <button (click)="closeModals()" class="mt-6 text-blue-600 hover:underline text-sm">Close</button>
                 </div>
             </div>
 
             <!-- < SHOW EDIT MODAL > -->
 
-            <div *ngIf="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-                <div class="bg-white rounded-xl p-6 w-[400px]">
-                    <form (ngSubmit)="submitEdit()" #editForm="ngForm">
-                        <h2 class="text-xl font-bold mb-4">Edit Task</h2>
+            <div *ngIf="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+                    <div class="bg-white rounded-xl p-6  dark:bg-gray-800 dark:text-black  w-[400px] h-fit">                   
+                        <form (ngSubmit)="submitEdit()" #editForm="ngForm">
+                        <h2 class="text-xl dark:text-white font-bold mb-4">Edit Task</h2>
                         <div class="mb-4">
                             <input
                                 type="text"

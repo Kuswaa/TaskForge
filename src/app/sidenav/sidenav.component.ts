@@ -16,7 +16,12 @@ import { CommonModule } from '@angular/common';
 export class SidenavComponent {
 
   @Output() categorySelected = new EventEmitter<string>();
+  @Output() openModal = new EventEmitter<void>();
 
+  triggerModal() {
+    this.openModal.emit();
+  }
+  
   categories = ['Personal', 'Study', 'Work', 'Home'];
 
   showCreateModal = false;
@@ -29,13 +34,16 @@ export class SidenavComponent {
     completed: false
   };
 
-  constructor(private authService: AuthService, private dbService: DatabaseCommService) {}
+  selectedCategory: string = 'all';
 
-  onCategoryClick(category: string): void {
+  constructor(private authService: AuthService, private dbService: DatabaseCommService) {}
+  
+  onCategoryClick(category: string) {
+    this.selectedCategory = category;
     this.categorySelected.emit(category);
   }
 
-  logout() {
+  logout() {  
     this.authService.logout();
   }
 
@@ -44,18 +52,19 @@ export class SidenavComponent {
       console.warn('Please fill in all fields');
       return;
     }
-
+  
     this.dbService.addTask(this.newTask).subscribe({
       next: () => {
         console.log('Task created successfully');
         this.showCreateModal = false;
         this.resetNewTask();
       },
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Error creating task:', error);
       }
     });
   }
+  
 
   closeModal(): void {
     this.showCreateModal = false;

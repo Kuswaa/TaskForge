@@ -13,5 +13,10 @@ export class HeaderComponent
 {
   isDarkMode: boolean = false;
 
+  toggleDarkMode()
+  {
+    this.isDarkMode = !this.isDarkMode;
+  }
+
   constructor(public themeToggleService: ThemeToggleService) {}
 }

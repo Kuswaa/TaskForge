@@ -1,17 +1,47 @@
 import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut , getAuth} from '@angular/fire/auth';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User
+} from '@angular/fire/auth';
+import { setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { Router } from '@angular/router';
+import { BehaviorSubject, Observable } from 'rxjs';
 
-@Injectable({ providedIn: 'root'  
+@Injectable({
+  providedIn: 'root'
 })
-
 export class AuthService {
-  constructor(private auth: Auth, private router: Router) {}
+  private userSubject = new BehaviorSubject<User | null>(null);
+  user$ = this.userSubject.asObservable();
+
+  private isAuthInitialized = new BehaviorSubject<boolean>(false);
+  isAuthInitialized$ = this.isAuthInitialized.asObservable();
+
+  constructor(private auth: Auth, private router: Router) {
+    this.initAuthListener();
+  }
+
+  private initAuthListener(): void {
+    setPersistence(this.auth, browserLocalPersistence)
+      .then(() => {
+        onAuthStateChanged(this.auth, (user) => {
+          console.log('User state changed: ', user);
+          this.userSubject.next(user);
+          this.isAuthInitialized.next(true); 
+        });
+      })
+      .catch((error) => {
+        console.error('Error setting persistence:', error);
+      });
+  }
 
   async login(email: string, password: string): Promise<void> {
     try {
       await signInWithEmailAndPassword(this.auth, email, password);
-      localStorage.setItem('isLoggedIn', 'true');
       this.router.navigate(['/home']);
     } catch (error) {
       console.error('Login failed:', error);
@@ -22,7 +52,6 @@ export class AuthService {
   async signup(email: string, password: string): Promise<void> {
     try {
       await createUserWithEmailAndPassword(this.auth, email, password);
-      localStorage.setItem('isLoggedIn', 'true');
       this.router.navigate(['/home']);
     } catch (error) {
       console.error('Signup failed:', error);
@@ -33,7 +62,6 @@ export class AuthService {
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
-      localStorage.removeItem('isLoggedIn');
       this.router.navigate(['/login']);
     } catch (error) {
       console.error('Logout failed:', error);
@@ -41,12 +69,26 @@ export class AuthService {
     }
   }
 
-  isLoggedIn(): boolean {
-    return localStorage.getItem('isLoggedIn') === 'true';
+  getCurrentUserId(): string | null {
+    return this.userSubject.value?.uid ?? null;
   }
 
-  getCurrentUserId(): string | null {
-    const auth = getAuth();
-    return auth.currentUser ? auth.currentUser.uid : null;
+  getCurrentUserIdAsync(): Promise<string | null> {
+    return new Promise((resolve) => {
+      const sub = this.user$.subscribe((user) => {
+        if (user) {
+          resolve(user.uid);
+          sub.unsubscribe();
+        }
+      });
+    });
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.userSubject.value;
+  }
+
+  getUserObservable(): Observable<User | null> {
+    return this.user$;
   }
 }
