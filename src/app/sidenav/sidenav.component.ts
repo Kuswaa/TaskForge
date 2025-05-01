@@ -39,7 +39,6 @@ export class SidenavComponent {
   constructor(private authService: AuthService, private dbService: DatabaseCommService) {}
   
   onCategoryClick(category: string) {
-    this.selectedCategory = category;
     this.categorySelected.emit(category);
   }
 

@@ -26,12 +26,12 @@
         <div class="card-grid grid grid-cols-2 gap-4 mt-4">
             <div
                 *ngFor="let task of tasks; index as i" 
-                class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer dark:text-white"
+                class="border border-gray-300 dark:border-gray-600 flex flex-col dark:bg-gray-800 p-4 rounded-lg cursor-pointer z-0 dark:text-white"
                 [ngClass]="{ 'opacity-40 line-through': task.completed }"
                 id="task-grid"
                 >                
-                <div class="flex flex-row items-center justify-between relative z-10">
-                    <div class="text-xl font-bold">{{ task.title }}</div>
+                <div class="flex flex-row justify-between relative z-10">
+                    <div class="text-xl self-start font-bold">{{ task.title }}</div>
                     <div class="flex items-center mr-4 relative z-10">
                         <input 
                         class="cursor-pointer" 
@@ -47,9 +47,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="pt-2 mt-2 border-t border-gray-300 dark:border-gray-600 flex flex-row justify-between items-start dark:text-white">
-                    <div><span class="font-semibold max-w-[70%]">Description: </span>  {{ task.description }}</div>
-                    <div class="flex flex-col items-end justify-center min-w-[30%]">
+                <div class="pt-3 mt-2 border-t border-gray-300 dark:border-gray-600 flex flex-row justify-between items-start overflow-y-hidden  dark:text-white">
+                    <div class="overflow-scroll no-scrollbar max-h-[50px] max-w-[70%] text-wrap"><span class="font-semibold">Description: </span>  {{ task.description }}</div>
+                    <div class="flex flex-col items-end justify-center min-w-[30%] gap-1 py-1">
                         <div><span class="font-semibold">Due: </span>{{ task.date }}</div>
                         <div><span class="font-semibold">Category: </span>{{ task.category }}</div>
                     </div>
@@ -59,54 +59,87 @@
             <!-- < SHOW EDIT MODAL > -->
 
             <div *ngIf="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                    <div class="bg-white rounded-xl p-6  dark:bg-gray-800 dark:text-black  w-[400px] h-fit">                   
-                        <form (ngSubmit)="submitEdit()" #editForm="ngForm">
-                        <h2 class="text-xl dark:text-white font-bold mb-4">Edit Task</h2>
-                        <div class="mb-4">
-                            <input
+                <div class="bg-white rounded-xl p-6  dark:bg-gray-800 dark:text-black  w-[400px] h-fit">                           
+                        <form (ngSubmit)="submitEdit()" #editForm="ngForm" novalidate>
+                            <h2 class="text-xl dark:text-white font-bold mb-4">Edit Task</h2>
+                            
+                                <div class="mb-4">
+                                <input
                                 type="text"
                                 class="border rounded w-full p-2"
                                 [(ngModel)]="editTask.title"
+                                #editTitleRef="ngModel"
                                 name="title"
                                 placeholder="Task Title"
                                 required
-                            />
-                        </div>
-                        <div class="mb-4">
-                            <textarea 
+                                minlength="3"
+                                />
+                              <div *ngIf="editTitleRef.invalid && editTitleRef.touched" class="text-red-500 text-sm mt-1">
+                                <div *ngIf="editTitleRef.errors?.['required']">Title is required</div>
+                                <div *ngIf="editTitleRef.errors?.['minlength']">Minimum 3 characters</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <textarea 
                                 class="border rounded w-full p-2" 
                                 [(ngModel)]="editTask.description" 
+                                #editDescRef="ngModel"
                                 name="description" 
                                 placeholder="Task Description" 
-                                required>
-                            </textarea>
-                        </div>
-                        <div class="mb-4">
-                            <input 
+                                required
+                                minlength="5"
+                                ></textarea>
+                              <div *ngIf="editDescRef.invalid && editDescRef.touched" class="text-red-500 text-sm mt-1">
+                                <div *ngIf="editDescRef.errors?.['required']">Description is required</div>
+                                <div *ngIf="editDescRef.errors?.['minlength']">Minimum 5 characters</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <input 
                                 type="date" 
                                 class="border rounded w-full p-2" 
                                 [(ngModel)]="editTask.date" 
+                                #editDateRef="ngModel"
                                 name="date" 
                                 required
-                            />
-                        </div>
-                        <div class="mb-6">
-                            <select 
+                                />
+                              <div *ngIf="editDateRef.invalid && editDateRef.touched" class="text-red-500 text-sm mt-1">
+                                <div *ngIf="editDateRef.errors?.['required']">Date is required</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <select 
                                 class="border rounded w-full p-2" 
                                 [(ngModel)]="editTask.category" 
+                                #editCatRef="ngModel"
                                 name="category" 
                                 required
-                            >
+                                >
                                 <option value="" disabled>Select Category</option>
-                                <option value="Work">Work</option>
                                 <option value="Personal">Personal</option>
-                                <option value="Urgent">Urgent</option>
+                                <option value="Study">Study</option>
+                                <option value="Work">Work</option>
+                                <option value="Home">Home</option>
                             </select>
-                        </div>
-                        <div class="flex justify-end">
-                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
-                        </div>
-                    </form>
+                              <div *ngIf="editCatRef.invalid && editCatRef.touched" class="text-red-500 text-sm mt-1">
+                                <div *ngIf="editCatRef.errors?.['required']">Category is required</div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-end">
+                                <button 
+                                type="submit" 
+                                [disabled]="editForm.invalid"
+                                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                Update
+                                </button>
+                            </div>
+                            </form>
+                            
                 </div>
             </div>
         </div>

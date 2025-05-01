@@ -2,35 +2,50 @@
     <div class="bg-white dark:bg-gray-700 rounded-lg shadow-lg p-8 w-full max-w-md">
       <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-white text-center">Sign Up</h2>
   
-      <form (ngSubmit)="signup()" #signupForm="ngForm">
+      <form (ngSubmit)="signup()" #signupForm="ngForm" novalidate>
         <div class="mb-4">
-          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="email">Username</label>
+          <label class="block text-gray-700 dark:text-gray-300 mb-2" for="username">Username</label>
           <input 
-          [(ngModel)]="username"  
+            [(ngModel)]="username"  
+            #usernameRef="ngModel"
             id="username" 
             name="username"
-            type="username" 
+            type="text" 
+            required
+            minlength="3"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" 
             placeholder="Enter your Username" 
           />
+          <div *ngIf="usernameRef.invalid && usernameRef.touched" class="text-red-500 text-sm mt-1">
+            <div *ngIf="usernameRef.errors?.['required']">Username is required</div>
+            <div *ngIf="usernameRef.errors?.['minlength']">Minimum 3 characters required</div>
+          </div>
         </div>
-  
+      
         <div class="mb-6">
           <label class="block text-gray-700 dark:text-gray-300 mb-2" for="password">Password</label>
           <input
             [(ngModel)]="password"
+            #passwordRef="ngModel"
             id="password" 
             name="password"
             type="password" 
+            required
+            minlength="6"
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" 
             placeholder="Enter your password" 
           />
+          <div *ngIf="passwordRef.invalid && passwordRef.touched" class="text-red-500 text-sm mt-1">
+            <div *ngIf="passwordRef.errors?.['required']">Password is required</div>
+            <div *ngIf="passwordRef.errors?.['minlength']">Password must be at least 6 characters</div>
+          </div>
         </div>
-  
+      
         <button 
           type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300"
-          >
+          [disabled]="signupForm.invalid"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           Sign Up
         </button>
       </form>

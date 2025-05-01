@@ -16,8 +16,9 @@ import { Firestore, collection, onSnapshot } from '@angular/fire/firestore';
 export class HomeComponent implements OnInit, OnDestroy
 {
   tasks: Task[] = [];
+  filteredTasks: any[] = [];
   userId: string | null = null;
-
+  selectedCategory: string = '';
 
   showDropdown: string | null = null;
   showEditModal = false;
@@ -52,6 +53,19 @@ export class HomeComponent implements OnInit, OnDestroy
         this.unsubscribeSnapshot?.();
       }
     });
+  }
+
+  onCategorySelected(category: string) {
+    this.selectedCategory = category;
+    this.filterTasks();
+  }
+
+  filterTasks() {
+    if (this.selectedCategory) {
+      this.filteredTasks = this.tasks.filter(task => task.category === this.selectedCategory);
+    } else {
+      this.filteredTasks = this.tasks; 
+    }
   }
 
   listenToTasks(): void {
