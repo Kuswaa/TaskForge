@@ -1,6 +1,9 @@
-<div class="bg-white outermost w-full h-[12vh] flex items-center justify-between border-b border-gray-300 dark:border-b-gray-600 dark:bg-gray-800 dark:text-white px-4">
+<div class="bg-white outermost w-full h-[12vh] flex items-center justify-between border-b border-gray-300 dark:border-b-gray-600 dark:bg-gray-800 dark:text-white pl-2 pr-4">
     <div class="left">
-        <div class="logo bg-green-600 cursor-pointer">LOGO</div>
+        <div class="logo cursor-pointer">
+            <div [class.hidden]="isDarkMode === false"><img  class="h-[12vh] p-2 "  src="assets/logo1.png" alt="logo should be here"></div>
+            <div [class.hidden]="isDarkMode === true"><img   class="h-[12vh] p-2 " src="assets/logo2.png" alt="logo should be here"></div>
+        </div>
     </div>
     <div class="right flex gap-4 items-center">
         <div class="toggle" (click)="themeToggleService.toggleDarkMode(); toggleDarkMode()">
