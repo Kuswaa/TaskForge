@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/taskforge",
+    "public": "dist/task-forge/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
